@@ -6,9 +6,9 @@ use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 
-if (ApplicationType::fromRequest($request)->isFrontend()) {
-    GeneralUtility::makeInstance(\TYPO3\CMS\Install\Service\SessionService::class)->startSession();
-}
+#if (ApplicationType::fromRequest($request)->isFrontend()) {
+#    GeneralUtility::makeInstance(\TYPO3\CMS\Install\Service\SessionService::class)->startSession();
+#}
 
 /***
  *
@@ -20,9 +20,7 @@ if (ApplicationType::fromRequest($request)->isFrontend()) {
  *  (c) 2019
  *
  ***/
-/**
- * ProtectPagesController
- */
+
 class ProtectPagesController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
 {
 
@@ -135,13 +133,13 @@ class ProtectPagesController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCon
 
     /**
      * action form
-     *
-     * @return void
      */
     public function formAction()
     {
         if ($_REQUEST['inavlid']) {
             $this->view->assign('inavlid', 1);
         }
+
+        return $this->htmlResponse();
     }
 }

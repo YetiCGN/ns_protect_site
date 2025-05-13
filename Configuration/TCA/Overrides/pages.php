@@ -1,5 +1,5 @@
 <?php
-if (!defined('TYPO3_MODE')) {
+if (!defined('TYPO3')) {
     die('Access denied.');
 }
 
@@ -35,16 +35,8 @@ $GLOBALS['TCA']['pages']['palettes']['tx_nsprotectsite'] = [
 ];
 
 // Make fields visible in the TCEforms:
-if (version_compare(TYPO3_branch, '10.0', '<')) {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
-        'pages', // Table name
-    '--div--;LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:tx_nsprotectsite_domain_model_protectpages;tx_nsprotectsite',
-        '1' // List of specific types to add the field list to. (If empty, all type entries are affected)
-    );
-} else {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
-        'pages', // Table name
-    '--div--;LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:tx_nsprotectsite_domain_model_protectpages,--palette--;LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:tx_nsprotectsite_domain_model_protectpages;tx_nsprotectsite',
-        '1' // List of specific types to add the field list to. (If empty, all type entries are affected)
-    );
-}
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+    'pages', // Table name
+'--div--;LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:tx_nsprotectsite_domain_model_protectpages,--palette--;LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:tx_nsprotectsite_domain_model_protectpages;tx_nsprotectsite',
+    '1' // List of specific types to add the field list to. (If empty, all type entries are affected)
+);
