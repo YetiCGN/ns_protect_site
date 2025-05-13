@@ -124,7 +124,7 @@ class ProtectPagesController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCon
             $uriBuilder = $this->uriBuilder;
             $uri = $uriBuilder
                 ->setTargetPageUid($pageUid)
-                ->setArguments(['type' => '88889', 'inavlid' => '1'])
+                ->setArguments(['type' => '88889', 'invalid' => '1'])
                 ->setCreateAbsoluteUri(true)
                 ->build();
             $this->redirectToUri($uri);
@@ -136,8 +136,8 @@ class ProtectPagesController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionCon
      */
     public function formAction()
     {
-        if ($_REQUEST['inavlid']) {
-            $this->view->assign('inavlid', 1);
+        if ($_REQUEST['invalid']) {
+            $this->view->assign('invalid', 1);
         }
 
         return $this->htmlResponse();
