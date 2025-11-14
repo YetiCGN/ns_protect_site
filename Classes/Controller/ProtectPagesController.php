@@ -12,7 +12,8 @@ use TYPO3\CMS\Extbase\Mvc\RequestInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 use TYPO3\CMS\Install\Service\SessionService;
 
-if (ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend()) {
+$request = $GLOBALS['TYPO3_REQUEST'];
+if ($request && ApplicationType::fromRequest($request)->isFrontend()) {
     GeneralUtility::makeInstance(SessionService::class)->startSession();
 }
 
