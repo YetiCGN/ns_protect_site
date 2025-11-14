@@ -1,14 +1,20 @@
 <?php
 namespace Nitsan\NsProtectSite\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Crypto\PasswordHashing\InvalidPasswordHashException;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
 use TYPO3\CMS\Core\Http\ApplicationType;
+use TYPO3\CMS\Core\Http\RedirectResponse;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\RequestInterface;
+use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Install\Service\SessionService;
 
-#if (ApplicationType::fromRequest($request)->isFrontend()) {
-#    GeneralUtility::makeInstance(\TYPO3\CMS\Install\Service\SessionService::class)->startSession();
-#}
+if (ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isFrontend()) {
+    GeneralUtility::makeInstance(SessionService::class)->startSession();
+}
 
 /***
  *
@@ -17,126 +23,86 @@ use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
  * For the full copyright and license information, please read the
  * LICENSE.txt file that was distributed with this source code.
  *
- *  (c) 2019
+ *  (c) 2019-2025
  *
  ***/
 
-class ProtectPagesController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class ProtectPagesController extends ActionController
 {
-
-    /**
-     * action list
-     *
-     * @return bool
-     */
-    public function loadAction()
+    public function processRequest(RequestInterface $request): ResponseInterface
     {
-        $data = $GLOBALS['TSFE']->page;
+        $response = parent::processRequest($request);
+        if ($response instanceof RedirectResponse) {
+            return $response;
+        }
+
+        // Return nothing when page is not password protected or password was entered correctly, even if hacky
+        $nothing = $this->htmlResponse('');
+
+        $redirectOrForm = $this->loadAction();
+
+        return $redirectOrForm ?? $nothing;
+    }
+
+    public function loadAction(): ?ResponseInterface
+    {
+        $tsFeController = $GLOBALS['TSFE'];
+        $data = $tsFeController->page;
         $pageUid = $data['uid'];
 
-        if (isset($_SESSION['password-' . $pageUid . '-protect'])) {
-            return true;
-        } else {
-            $isActive = $data['tx_nsprotectsite_protection'];
-            if ($isActive) {
-                $pageUid = $data['uid'];
-                $uriBuilder = $this->uriBuilder;
-                $uri = $uriBuilder
-                    ->setTargetPageUid($pageUid)
-                    ->setArguments(['type' => '88889'])
-                    ->setCreateAbsoluteUri(true)
-                    ->build();
-                $this->redirectToUri($uri);
-            }
+        // Page is not password protected, let them through
+        if (!$data['tx_nsprotectsite_protection']) {
+            return null;
         }
-        return true;
+        // Password was provided, let them through
+        if (isset($_SESSION['password-' . $pageUid . '-protect'])) {
+            return null;
+        }
+        // Password form was requested, show it
+        if ($tsFeController->getPageArguments()->getPageType() === '88889') {
+            return $this->htmlResponse();
+        }
+
+        if ($this->uriBuilder === null) {
+            $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        }
+        $uriBuilder = $this->uriBuilder;
+        $uri = $uriBuilder
+            ->setTargetPageUid($pageUid)
+            ->setArguments(['type' => '88889'])
+            ->setCreateAbsoluteUri(true)
+            ->build();
+        return $this->redirectToUri($uri);
     }
 
     /**
-     * action login
-     *
-     * @return void
-     * @throws InvalidPasswordHashException|StopActionException
+     * @throws InvalidPasswordHashException
      */
-    public function loginAction()
+    public function loginAction(): ResponseInterface
     {
-        $params = \TYPO3\CMS\Core\Utility\GeneralUtility::_GP('tx_nsprotectsite_nsprotectsite');
-
         $data = $GLOBALS['TSFE']->page;
         $saltedPassword = $data['tx_nsprotectsite_protect_password'];
-        $pass = $params['pass'];
 
-        $success = false;
-        if ($GLOBALS['TYPO3_CONF_VARS']['BE']['loginSecurityLevel'] == 'rsa') {
-            if (version_compare(TYPO3_branch, '9.4', '<')) {
-                if (\TYPO3\CMS\Saltedpasswords\Utility\SaltedPasswordsUtility::isUsageEnabled('FE')) {
-                    $objSalt = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance(NULL);
-                    if (is_object($objSalt)) {
-                        $saltedPassword = $objSalt->getHashedPassword($saltedPassword);
-                    }
-                }
-                $objSalt = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance($saltedPassword, 'BE');
-            } else {
-                $objSalt = (new \TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory)->get($saltedPassword, 'BE');
-            }
-            if (is_object($objSalt)) {
-                $success = $objSalt->checkPassword($pass, $saltedPassword);
-            }
-        } elseif ($GLOBALS['TYPO3_CONF_VARS']['BE']['loginSecurityLevel'] == 'md5') {
-            $password = md5($pass);
-            if ($saltedPassword == $password) {
-                $success = true;
-            }
-        } elseif ($GLOBALS['TYPO3_CONF_VARS']['BE']['loginSecurityLevel'] === 'sha1') {
-            $password = sha1($pass);
-            if ($saltedPassword == $password) {
-                $success = true;
-            }
-        } else {
-            if (version_compare(TYPO3_branch, '9.4', '<')) {
-                if (\TYPO3\CMS\Saltedpasswords\Utility\SaltedPasswordsUtility::isUsageEnabled('FE')) {
-                    $objSalt = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance(NULL);
-                    if (is_object($objSalt)) {
-                        $saltedPassword = $objSalt->getHashedPassword($saltedPassword);
-                    }
-                }
-                $objSalt = \TYPO3\CMS\Saltedpasswords\Salt\SaltFactory::getSaltingInstance($saltedPassword, 'BE');
-            } else {
-                $objSalt = (new \TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory)->get($saltedPassword, 'BE');
-            }
-            if (is_object($objSalt)) {
-                $success = $objSalt->checkPassword($pass, $saltedPassword);
-            }
-        }
+        $objSalt = (new PasswordHashFactory)->get($saltedPassword, 'BE');
+        $success = $objSalt->checkPassword($this->request->getArguments()['pass'], $saltedPassword);
 
+        $pageUid = $data['uid'];
+        $uriBuilder = $this->uriBuilder;
+        $uri = $uriBuilder->setTargetPageUid($pageUid)->setCreateAbsoluteUri(true);
         if ($success === true) {
-            $pageUid = $data['uid'];
-            $uriBuilder = $this->uriBuilder;
             $_SESSION['password-' . $pageUid . '-protect'] = 'Yes';
-
-            $uri = $uriBuilder
-                ->setTargetPageUid($pageUid)
-                ->setCreateAbsoluteUri(true)
-                ->build();
-            $this->redirectToUri($uri);
         } else {
-            $pageUid = $data['uid'];
-            $uriBuilder = $this->uriBuilder;
-            $uri = $uriBuilder
-                ->setTargetPageUid($pageUid)
-                ->setArguments(['type' => '88889', 'invalid' => '1'])
-                ->setCreateAbsoluteUri(true)
-                ->build();
-            $this->redirectToUri($uri);
+            $uri->setArguments(['type' => '88889', 'invalid' => '1']);
         }
+
+        return $this->redirectToUri($uri->build(), statusCode: 307);
     }
 
-    /**
-     * action form
-     */
-    public function formAction()
+    public function formAction(): ResponseInterface
     {
-        if ($_REQUEST['invalid']) {
+        $params = $this->request->getQueryParams();
+
+        if (array_key_exists('invalid', $params) && $params['invalid'] === '1') {
             $this->view->assign('invalid', 1);
         }
 
