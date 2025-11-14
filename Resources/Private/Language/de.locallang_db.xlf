@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2025-11-14T13:46:53Z" product-name="ns_protect_site">
+		<header/>
+		<body>
+			<trans-unit id="tx_nsprotectsite_domain_model_protectpages">
+				<source>Protect Pages</source>
+				<target>Passwortschutz</target>
+			</trans-unit>
+			<trans-unit id="tx_nsprotectsite_domain_model_protectpages.title">
+				<source>Title</source>
+                <target>Titel</target>
+			</trans-unit>
+			<trans-unit id="tx_ns_protect_site_nsprotectsite.name">
+				<source>Protect site</source>
+                <target>Schütze Seite</target>
+			</trans-unit>
+			<trans-unit id="tx_ns_protect_site_nsprotectsite.description">
+				<source></source>
+			</trans-unit>
+			<trans-unit id="enableprotect">
+				<source>Enable Protection</source>
+				<target>Passwortschutz aktivieren</target>
+			</trans-unit>
+			<trans-unit id="addpass">
+				<source>Add Password</source>
+				<target>Passwort</target>
+			</trans-unit>
+
+		</body>
+	</file>
+</xliff>
