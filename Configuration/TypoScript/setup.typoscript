@@ -39,19 +39,12 @@ plugin.tx_nsprotectsite_nsprotectsite {
 
 page {
     885544 >
-    885544 = USER
+    885544 = EXTBASEPLUGIN
     885544 {
         typeNum = 88889
-        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
-        pluginName = Nsprotectsite
         extensionName = NsProtectSite
+        pluginName = Nsprotectsite
         controller = ProtectPages
-        vendorName = Nitsan
-        switchableControllerActions {
-            ProtectPages {
-                1 = load
-            }
-        }
     }
 }
 
