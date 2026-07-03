@@ -19,9 +19,8 @@ $fields = [
     'displayCond' => 'FIELD:tx_nsprotectsite_protection:>:0',
     'label' => 'LLL:EXT:ns_protect_site/Resources/Private/Language/locallang_db.xlf:addpass',
     'config' => [
-        'type' => 'input',
-        'max' => 100,
-        'eval' => 'trim,required,password,saltedPassword',
+        'type' => 'password',
+        'required' => true,
     ]
   ]
 ];

@@ -64,12 +64,8 @@ loginAction {
         pluginName = Nsprotectsite
         extensionName = NsProtectSite
         controller = ProtectPages
+        action = login
         vendorName = Nitsan
-        switchableControllerActions {
-            ProtectPages {
-                1 = login
-            }
-        }
     }
 }
 
@@ -101,11 +97,7 @@ formAction {
         pluginName = Nsprotectsite
         extensionName = NsProtectSite
         controller = ProtectPages
+        action = form
         vendorName = Nitsan
-        switchableControllerActions {
-            ProtectPages {
-                1 = form
-            }
-        }
     }
 }
