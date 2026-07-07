@@ -60,7 +60,7 @@ class ProtectPagesController extends ActionController
             return null;
         }
         // Password form was requested, show it
-        if ($tsFeController->getPageArguments()->getPageType() === '88889') {
+        if ($this->request->getAttribute('routing')->getPageType() === '88889') {
             return $this->htmlResponse();
         }
 
