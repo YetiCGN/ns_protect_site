@@ -1,7 +1,7 @@
 {
-    "name": "nitsan/ns-protect-site",
+    "name": "explicatis/ns-protect-site",
     "type": "typo3-cms-extension",
-    "description": "This extension will help you to quickly password protected TYPO3 pages without frontend users management, Check manual for more details. Live-Demo: https://demo.t3terminal.com/t3t-extensions/general-utility/protect-site?inavlid=1&type=88889 You can download PRO version for more-features & free-support at https://t3terminal.com/password-protect-site-typo3-plugin/",
+    "description": "This extension will help you to quickly password protected TYPO3 pages without frontend users management, check manual for more details.",
     "homepage": "https://extensions.typo3.org/extension/ns_protect_site/",
     "license": "GPL-2.0+",
     "keywords": [
@@ -9,15 +9,18 @@
         "Protect",
         "Page",
         "Site",
-        "Password",
-        "Algorithem",
-        "NITSAN"
+        "Password"
     ],
     "authors": [
         {
           "name": "NITSAN Technologies",
           "role": "Developer",
           "homepage": "https://www.nitsan.in/"
+        },
+        {
+          "name": "Explicatis GmbH",
+            "role": "Developer",
+            "homepage": "https://www.explicatis.com/"
         }
     ],
     "require": {
